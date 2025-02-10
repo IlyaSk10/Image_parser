@@ -5,27 +5,25 @@ from selenium.webdriver.common.by import By
 from selenium.common.exceptions import StaleElementReferenceException
 import urllib.request
 import time
+from chromedriver_py import binary_path
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
 
 # to run Chrome in headless mode
 options = Options()
-options.add_argument("--headless")
+#options.add_argument("--headless")
 
-query = 'art'
+query = 'laptop'
 
-# initialize a Chrome WerbDriver instance
-# with the specified options
-# driver = webdriver.Chrome(
-#     service=ChromeService(),
-#     options=options
-# )
-driver = webdriver.Firefox()
-#Firefox()
-# to avoid issues with responsive content
+svc = webdriver.ChromeService(executable_path=binary_path)
+driver = webdriver.Chrome(
+    service=svc
+)
+
 driver.maximize_window()
 
 # the URL of the target page
 url = f"https://unsplash.com/s/photos/{query}?license=free"
-#url = f"https://www.shopify.com/stock-photos/photos/search?q={query}"
 # visit the target page in the controlled browser
 driver.get(url)
 
@@ -37,29 +35,6 @@ driver.get(url)
 # images[0].get_attribute('src')
 # where to store the scraped image url
 
-def scroll_down():
-    """A method for scrolling the page."""
-
-    # Get scroll height.
-    last_height = driver.execute_script("return document.body.scrollHeight")
-
-    while True:
-
-        # Scroll down to the bottom.
-        driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
-
-        # Wait to load the page.
-        time.sleep(2)
-
-        # Calculate new scroll height and compare with last scroll height.
-        new_height = driver.execute_script("return document.body.scrollHeight")
-
-        if new_height == last_height:
-            break
-
-        last_height = new_height
-
-
 count = 0
 images = driver.find_elements(By.TAG_NAME, 'img')
 #images  = driver.execute_script("return window.performance.getEntriesByType('resource');")
@@ -67,22 +42,36 @@ count = count + len(images)
 last_height = driver.execute_script("return document.body.scrollHeight")
 #last_height = driver.execute_script("window.scrollTo(0, document.body.scrollHeight);var lenOfPage=document.body.scrollHeight;return lenOfPage;")
 
+try:
+    # explore_button = WebDriverWait(driver, 1).until(
+    #    EC.visibility_of_element_located((By.CLASS_NAME, 'ZGh7S kx6eK x_EXo R6ToQ QcIGU l0vpf a_AEd ncszm MCje9 daPLj R6ToQ'))
+    # )
+    # explore_button=driver.find_element(By.CLASS_NAME, 'ZGh7S kx6eK x_EXo R6ToQ QcIGU l0vpf a_AEd ncszm MCje9 daPLj R6ToQ')
+    explore_button = driver.find_element(By.XPATH, '//button[text()="Load more"]')
+    # Нажатие на кнопку "Explore"
+    explore_button.click()
+    print("Кнопка 'Explore' нажата.")
+except:
+    print("Кнопка 'Explore' не видна на странице.")
+
 while True:
 
-    driver.execute_script("window.scrollTo(0, 1000)")
-    #driver.execute_script("window.scrollTo(0, document.body.scrollHeight);var lenOfPage=document.body.scrollHeight;return lenOfPage;")
+    driver.execute_script("window.scrollBy(0,1000)")
+    #driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
 
-    time.sleep(2)
+    time.sleep(1)
+
+
 
     #driver.maximize_window()
 
-    images = driver.find_elements(By.TAG_NAME, 'img')
-    count = count + len(images)
-    print(count)
+    #images = driver.find_elements(By.TAG_NAME, 'img')
+    #count = count + len(images)
+    #print(count)
     new_height = driver.execute_script("return document.body.scrollHeight")
 
-    if new_height == last_height:
-        break
+    #if new_height == last_height:
+    #    break
 
     last_height = new_height
 
