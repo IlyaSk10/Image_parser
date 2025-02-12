@@ -11,7 +11,9 @@ from selenium.webdriver.support import expected_conditions as EC
 
 # to run Chrome in headless mode
 options = Options()
-#options.add_argument("--headless")
+options.add_argument("--headless")
+#options.add_argument("--no-sandbox")
+#options.add_argument("--disable-dev-shm-usage")
 
 query = 'laptop'
 
@@ -37,10 +39,10 @@ driver.get(url)
 
 count = 0
 images = driver.find_elements(By.TAG_NAME, 'img')
-#images  = driver.execute_script("return window.performance.getEntriesByType('resource');")
+# images  = driver.execute_script("return window.performance.getEntriesByType('resource');")
 count = count + len(images)
 last_height = driver.execute_script("return document.body.scrollHeight")
-#last_height = driver.execute_script("window.scrollTo(0, document.body.scrollHeight);var lenOfPage=document.body.scrollHeight;return lenOfPage;")
+# last_height = driver.execute_script("window.scrollTo(0, document.body.scrollHeight);var lenOfPage=document.body.scrollHeight;return lenOfPage;")
 
 try:
     # explore_button = WebDriverWait(driver, 1).until(
@@ -61,8 +63,6 @@ while True:
 
     time.sleep(1)
 
-
-
     #driver.maximize_window()
 
     #images = driver.find_elements(By.TAG_NAME, 'img')
@@ -73,49 +73,55 @@ while True:
     #if new_height == last_height:
     #    break
 
-    last_height = new_height
+    #last_height = new_height
+    images = driver.find_elements(By.TAG_NAME, 'img')
+    count = count + len(images)
+    print(count)
 
 print(count)
 driver.quit()
-image_urls = []
-
-# extract the URLs from each image
-for image_html_node in image_html_nodes:
-    try:
-        # use the URL in the "src" as the default behavior
-        image_url = image_html_node.get_attribute("src")
-
-        # extract the URL of the largest image from "srcset",
-        # if this attribute exists
-        srcset = image_html_node.get_attribute("srcset")
-        if srcset is not None:
-            # get the last element from the "srcset" value
-            srcset_last_element = srcset.split(", ")[-1]
-            # get the first element of the value,
-            # which is the image URL
-            image_url = srcset_last_element.split(" ")[0]
-
-        # add the image URL to the list
-        image_urls.append(image_url)
-    except StaleElementReferenceException as e:
-        continue
-
-# to keep track of the images saved to disk
-image_name_counter = 1
-
-# download each image and add it
-# to the "/images" local folder
-for image_url in image_urls:
-    print(f"downloading image no. {image_name_counter} ...")
-
-    file_name = f"./images/{image_name_counter}.jpg"
-    # download the image
-    urllib.request.urlretrieve(image_url, file_name)
-
-    print(f"images downloaded successfully to \"{file_name}\"\n")
-
-    # increment the image counter
-    image_name_counter += 1
-
-# close the browser and free up its resources
-driver.quit()
+# image_urls = []
+#
+# image_html_nodes = images
+# # extract the URLs from each image
+# for image_html_node in image_html_nodes:
+#     try:
+#         # use the URL in the "src" as the default behavior
+#         image_url = image_html_node.get_attribute("src")
+#
+#         # extract the URL of the largest image from "srcset",
+#         # if this attribute exists
+#         srcset = image_html_node.get_attribute("srcset")
+#         if srcset is not None:
+#             # get the last element from the "srcset" value
+#             srcset_last_element = srcset.split(", ")[-1]
+#             # get the first element of the value,
+#             # which is the image URL
+#             image_url = srcset_last_element.split(" ")[0]
+#
+#         # add the image URL to the list
+#         image_urls.append(image_url)
+#     except StaleElementReferenceException as e:
+#         continue
+#
+# # to keep track of the images saved to disk
+# image_name_counter = 1
+#
+# # download each image and add it
+# # to the "/images" local folder
+# for image_url in image_urls:
+#     print(f"downloading image no. {image_name_counter} ...")
+#
+#     file_name = f"./images/{image_name_counter}.jpg"
+#     # download the image
+#     urllib.request.urlretrieve(image_url, file_name)
+#
+#     print(f"images downloaded successfully to \"{file_name}\"\n")
+#
+#     # increment the image counter
+#     image_name_counter += 1
+#
+# # close the browser and free up its resources
+# driver.quit()
+#
+# pass
