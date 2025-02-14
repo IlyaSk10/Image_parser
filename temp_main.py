@@ -8,12 +8,11 @@ from selenium.common.exceptions import StaleElementReferenceException
 import os
 import time
 import requests
-import urllib
 
 folder_name = 'images'
+query = "laptop"
 
 
-# Функция для загрузки изображения
 def download_image(url, folder):
     if not os.path.exists(folder):
         os.makedirs(folder)
@@ -29,24 +28,20 @@ def download_image(url, folder):
 
 
 start = time.time()
-# Настройка опций для Chrome
+
 chrome_options = Options()
 chrome_options.add_argument("--headless")  # (опционально) работа в headless режиме
 chrome_options.add_argument("--no-sandbox")
 chrome_options.add_argument("--disable-dev-shm-usage")
 
-# Создание экземпляра драйвера
 svc = webdriver.ChromeService(executable_path=binary_path)
 driver = webdriver.Chrome(
     service=svc
 )
 
-# Открытие страницы Unsplash
-query = "laptop"  # Замените на ваш запрос
-# driver.get(f"https://unsplash.com/s/photos/{query}")
 driver.get(f"https://unsplash.com/s/photos/{query}?license=free")
 
-time.sleep(3)  # Дождитесь полной загрузки страницы
+time.sleep(3)
 
 print(time.time() - start)
 N_total = 33
@@ -54,7 +49,6 @@ count = 0
 
 while count < N_total:
 
-    # Получение всех изображений
     images = driver.find_elements(By.TAG_NAME, 'img')
 
     for i in range(len(images)):
@@ -64,7 +58,6 @@ while count < N_total:
             data_src = img.get_attribute('data-src')
             srcset = img.get_attribute('srcset')
 
-            # Выбираем URL изображения
             image_url = None
             if src and 'https' in src:
                 width = img.get_attribute('width')
@@ -101,7 +94,6 @@ while count < N_total:
 
     try:
         explore_button = driver.find_element(By.XPATH, '//button[text()="Load more"]')
-        # Нажатие на кнопку "Explore"
         explore_button.click()
         print("Кнопка 'Explore' нажата.")
     except:
@@ -109,7 +101,6 @@ while count < N_total:
 
     driver.execute_script("window.scrollBy(0,1000)")
 
-# Закрытие драйвера
 driver.quit()
 
 print("Скачивание завершено.")
