@@ -11,22 +11,24 @@ import requests
 query = "laptop"
 folder_name = query
 format = "png"
-N_total = 77
+N_total = 7
 
 
 class Scrapper:
 
-    def __init__(self, query, output_dir, number_images, format):
+    def __init__(self, query, output_dir, number_images, format, min_dimension, verbose=True):
         self.query = query
         self.output_dir = output_dir
         self.number_images = number_images
         self.format = format
+        self.min_dimension = min_dimension
+        self.verbose = verbose
 
     def webdriver_init(self):
         chrome_options = Options()
-        chrome_options.add_argument("--headless")  # optional
-        chrome_options.add_argument("--no-sandbox")
-        chrome_options.add_argument("--disable-dev-shm-usage")
+        # chrome_options.add_argument("--headless")  # optional
+        # chrome_options.add_argument("--no-sandbox")
+        # chrome_options.add_argument("--disable-dev-shm-usage")
 
         svc = webdriver.ChromeService(executable_path=binary_path)
         driver = webdriver.Chrome(service=svc)
@@ -71,7 +73,7 @@ class Scrapper:
 
                     image_url = None
 
-                    if width and height and int(width) > 100 and int(height) > 100:
+                    if width and height and int(width) > self.min_dimension and int(height) > self.min_dimension:
                         if src and 'https' in src:
                             image_url = src
                         elif data_src and 'https' in data_src:
@@ -85,6 +87,8 @@ class Scrapper:
 
                     if image_url:
                         self.download_image(image_url, image_number)
+                        if self.verbose:
+                            print(f'Image {image_number} downloaded')
                         image_number += 1
 
                     if image_number == self.number_images:
