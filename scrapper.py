@@ -8,10 +8,11 @@ import os
 import time
 import requests
 
-query = "laptop"
+query = ["brooklin", "new york"]
 folder_name = query
 format = "png"
 N_total = 7
+min_dimension = 100
 
 
 class Scrapper:
@@ -26,25 +27,20 @@ class Scrapper:
 
     def webdriver_init(self):
         chrome_options = Options()
-        # chrome_options.add_argument("--headless")  # optional
-        # chrome_options.add_argument("--no-sandbox")
-        # chrome_options.add_argument("--disable-dev-shm-usage")
+        chrome_options.add_argument("--headless")  # Запуск в безголовом режиме
 
         svc = webdriver.ChromeService(executable_path=binary_path)
         driver = webdriver.Chrome(service=svc)
 
-        driver.get(f"https://unsplash.com/s/photos/{self.query}?license=free")
         driver.maximize_window()
 
         return driver
 
-    def download_image(self, url, image_number):
-        if not os.path.exists(self.output_dir):
-            os.makedirs(self.output_dir)
+    def download_image(self, url, image_number, output_dir):
 
         response = requests.get(url)
         if response.status_code == 200:
-            with open(f'./{self.output_dir}/{image_number}.{self.format}', 'wb') as f:
+            with open(f'./{output_dir}/{image_number}.{self.format}', 'wb') as f:
                 f.write(response.content)
         else:
             print(f"Loading error: {response.status_code}")
@@ -53,67 +49,81 @@ class Scrapper:
 
         driver = self.webdriver_init()
 
-        time.sleep(3)
+        for query in self.query:
 
-        image_number = 0
+            print('-----------------------------------')
 
-        while image_number < self.number_images:
+            if not os.path.exists(query):
+                os.makedirs(query)
+                print(f'Directory /{query}/ created')
+            else:
+                print(f'Directory /{query}/ exists')
 
-            images = driver.find_elements(By.TAG_NAME, 'img')
+            print('-----------------------------------')
 
-            for i in range(len(images)):
+            driver.get(f"https://unsplash.com/s/photos/{query}?license=free")
+
+            time.sleep(3)
+
+            image_number = 0
+
+            while image_number < self.number_images:
+
+                images = driver.find_elements(By.TAG_NAME, 'img')
+
+                for i in range(len(images)):
+                    try:
+                        img = images[i]
+                        src = img.get_attribute('src')
+                        data_src = img.get_attribute('data-src')
+                        srcset = img.get_attribute('srcset')
+
+                        width = img.get_attribute('width')
+                        height = img.get_attribute('height')
+
+                        image_url = None
+
+                        if width and height and int(width) > self.min_dimension and int(height) > self.min_dimension:
+                            if src and 'https' in src:
+                                image_url = src
+                            elif data_src and 'https' in data_src:
+                                image_url = data_src
+                            elif srcset:
+                                image_url = srcset.split(',')[0].split(' ')[0]
+                        else:
+                            continue
+
+                        if image_url:
+                            self.download_image(image_url, image_number, query)
+                            if self.verbose:
+                                print(f'Directory /{query}/ , image {image_number} downloaded')
+                            image_number += 1
+
+                        if image_number == self.number_images:
+                            break
+
+                    except StaleElementReferenceException:
+                        print(f"The element is out of date, skip it")
+
+                if image_number == self.number_images:
+                    break
+
                 try:
-                    img = images[i]
-                    src = img.get_attribute('src')
-                    data_src = img.get_attribute('data-src')
-                    srcset = img.get_attribute('srcset')
+                    explore_button = driver.find_element(By.XPATH, '//button[text()="Load more"]')
+                    explore_button.click()
+                    # print("The button 'Load more' is pressed")
+                except:
+                    # print("The 'Load more' button is not visible on the page.")
+                    pass
 
-                    width = img.get_attribute('width')
-                    height = img.get_attribute('height')
-
-                    image_url = None
-
-                    if width and height and int(width) > self.min_dimension and int(height) > self.min_dimension:
-                        if src and 'https' in src:
-                            image_url = src
-                        elif data_src and 'https' in data_src:
-                            image_url = data_src
-                        elif srcset:
-                            image_url = srcset.split(',')[0].split(' ')[0]
-                    elif src and src.startswith('data:image/'):
-                        continue
-                    else:
-                        continue
-
-                    if image_url:
-                        self.download_image(image_url, image_number)
-                        if self.verbose:
-                            print(f'Image {image_number} downloaded')
-                        image_number += 1
-
-                    if image_number == self.number_images:
-                        break
-
-                except StaleElementReferenceException:
-                    print(f"The element is out of date, skip it")
-
-            if image_number == self.number_images:
-                break
-
-            try:
-                explore_button = driver.find_element(By.XPATH, '//button[text()="Load more"]')
-                explore_button.click()
-                # print("The button 'Load more' is pressed")
-            except:
-                # print("The 'Load more' button is not visible on the page.")
-                continue
-
-            driver.execute_script("window.scrollBy(0,1000)")
+                driver.execute_script("window.scrollBy(0,1000)")
 
         driver.quit()
+
+        print('-----------------------------------')
 
         print("Download complete")
 
 
-obj = Scrapper(query=query, output_dir=folder_name, number_images=N_total, format=format)
+obj = Scrapper(query=query, output_dir=folder_name, number_images=N_total, format=format, min_dimension=min_dimension)
 obj.get_url()
