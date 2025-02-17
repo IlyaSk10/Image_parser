@@ -8,18 +8,11 @@ import os
 import time
 import requests
 
-query = ["brooklin", "new york"]
-folder_name = query
-format = "png"
-N_total = 7
-min_dimension = 100
-
 
 class Scrapper:
 
-    def __init__(self, query, output_dir, number_images, format, min_dimension, verbose=True):
+    def __init__(self, query, number_images, format, min_dimension, verbose=True):
         self.query = query
-        self.output_dir = output_dir
         self.number_images = number_images
         self.format = format
         self.min_dimension = min_dimension
@@ -125,5 +118,4 @@ class Scrapper:
         print("Download complete")
 
 
-obj = Scrapper(query=query, output_dir=folder_name, number_images=N_total, format=format, min_dimension=min_dimension)
-obj.get_url()
+

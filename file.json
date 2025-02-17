@@ -1,0 +1,9 @@
+{
+    "query": [
+        "brooklin",
+        "new york"
+    ],
+    "number_images": 7,
+    "format": "png",
+    "min_dimension": 100
+}
