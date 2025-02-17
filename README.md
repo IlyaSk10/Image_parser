@@ -18,4 +18,4 @@ This project is licensed under the MIT License.
 See the **LICENSE.txt** for details.
 
 ## My contacts
-ilya.skv10@yandex.ru
+ilya.skv10@gmail.com
