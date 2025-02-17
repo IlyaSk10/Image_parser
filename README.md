@@ -8,8 +8,8 @@ The project is designed to download images from the Unsplash website using a **f
    **file.json** contains:  
    • **query** - query names **(supports multiple requests)**  
    • **number_images** - number of downloaded images  
-   • **format** - save in specified format  
-   • **min_dimension** - skip images smaller than **100x100** pixels
+   • **format** - save in specified image extension  
+   • **min_dimension** - skip images smaller e.g. than **100x100** pixels
 
 4. Run **main.py**
 
