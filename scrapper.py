@@ -29,7 +29,7 @@ class Scrapper:
 
         return driver
 
-    def download_image(self, url, image_number, output_dir):
+    def retrieve_image(self, url, image_number, output_dir):
 
         response = requests.get(url)
         if response.status_code == 200:
@@ -38,7 +38,7 @@ class Scrapper:
         else:
             print(f"Loading error: {response.status_code}")
 
-    def get_url(self):
+    def download_images(self):
 
         driver = self.webdriver_init()
 
@@ -87,7 +87,7 @@ class Scrapper:
                             continue
 
                         if image_url:
-                            self.download_image(image_url, image_number, query)
+                            self.retrieve_image(image_url, image_number, query)
                             if self.verbose:
                                 print(f'Directory /{query}/ , image {image_number} downloaded')
                             image_number += 1
