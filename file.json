@@ -1,9 +1,8 @@
 {
     "query": [
-        "brooklin",
-        "new york"
+        "volkswagen"
     ],
-    "number_images": 7,
+    "number_images": 300,
     "format": "png",
     "min_dimension": 100
 }

@@ -2,6 +2,7 @@ from scrapper import Scrapper
 
 import json
 
+
 file_path = 'file.json'
 
 with open(file_path, 'r', encoding='utf-8') as json_file:

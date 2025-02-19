@@ -56,17 +56,18 @@ class Scrapper:
 
             driver.get(f"https://unsplash.com/s/photos/{query}?license=free")
 
-            time.sleep(3)
+            time.sleep(2)
 
             image_number = 0
+            urls = []
 
             while image_number < self.number_images:
 
                 images = driver.find_elements(By.TAG_NAME, 'img')
+                time.sleep(2)
 
-                for i in range(len(images)):
+                for img in images:
                     try:
-                        img = images[i]
                         src = img.get_attribute('src')
                         data_src = img.get_attribute('data-src')
                         srcset = img.get_attribute('srcset')
@@ -86,11 +87,12 @@ class Scrapper:
                         else:
                             continue
 
-                        if image_url:
+                        if image_url and image_url not in urls:
                             self.retrieve_image(image_url, image_number, query)
                             if self.verbose:
                                 print(f'Directory /{query}/ , image {image_number} downloaded')
                             image_number += 1
+                            urls.append(image_url)
 
                         if image_number == self.number_images:
                             break
@@ -116,6 +118,3 @@ class Scrapper:
         print('-----------------------------------')
 
         print("Download complete")
-
-
-
